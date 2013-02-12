@@ -1,0 +1,144 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WP Places Manager\n"
+"POT-Creation-Date: 2013-02-12 14:22+0100\n"
+"PO-Revision-Date: 2013-02-12 14:28+0100\n"
+"Last-Translator: MBA Multimedia <mbamultimedia@gmail.com>\n"
+"Language-Team: MBA Multimedia\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.5\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_x\n"
+"X-Poedit-Basepath: C:\\Developpement\\projets\\wordpress\\plugins\\\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"Language: fr_FR\n"
+"X-Poedit-SearchPath-0: wp-places-manager\n"
+
+#: wp-places-manager/plugin.php:203 wp-places-manager/plugin.php:215
+msgid "Lieux"
+msgstr "Places"
+
+#: wp-places-manager/plugin.php:204
+msgid "Lieu"
+msgstr "Place"
+
+#: wp-places-manager/plugin.php:205
+msgid "Ajouter"
+msgstr "Add"
+
+#: wp-places-manager/plugin.php:206
+msgid "Ajouter nouveau lieu"
+msgstr "Add new place"
+
+#: wp-places-manager/plugin.php:207
+msgid "Editer lieu"
+msgstr "Edit place"
+
+#: wp-places-manager/plugin.php:208
+msgid "Nouveau lieu"
+msgstr "New place"
+
+#: wp-places-manager/plugin.php:209
+msgid "Tous les lieux"
+msgstr "All places"
+
+#: wp-places-manager/plugin.php:210
+msgid "Voir lieu"
+msgstr "See place"
+
+#: wp-places-manager/plugin.php:211
+msgid "Rechercher lieu"
+msgstr "Find a place"
+
+#: wp-places-manager/plugin.php:212
+msgid "Aucun lieu trouvé"
+msgstr "No place found"
+
+#: wp-places-manager/plugin.php:213
+msgid "Aucun lieu dans la corbeille"
+msgstr "No place in the trash"
+
+#: wp-places-manager/plugin.php:236
+msgid "Catégories de lieu"
+msgstr "Place categories"
+
+#: wp-places-manager/plugin.php:237
+msgid "Catégorie de lieu"
+msgstr "Place category"
+
+#: wp-places-manager/plugin.php:238
+msgid "Rechercher catégorie"
+msgstr "Find a category"
+
+#: wp-places-manager/plugin.php:239
+msgid "Toutes les catégories"
+msgstr "All categories"
+
+#: wp-places-manager/plugin.php:240
+msgid "Parent"
+msgstr ""
+
+#: wp-places-manager/plugin.php:241
+msgid "Parent:"
+msgstr ""
+
+#: wp-places-manager/plugin.php:242
+msgid "Editer catégorie"
+msgstr ""
+
+#: wp-places-manager/plugin.php:243
+msgid "Update Product Category"
+msgstr ""
+
+#: wp-places-manager/plugin.php:244
+msgid "Ajouter nouvelle catégorie"
+msgstr "Add new category"
+
+#: wp-places-manager/plugin.php:245
+msgid "Nouvelle catégorie"
+msgstr "New category"
+
+#: wp-places-manager/plugin.php:246
+msgid "Catégories de lieux"
+msgstr ""
+
+#: wp-places-manager/plugin.php:264
+msgid "Coordonnées postales"
+msgstr ""
+
+#: wp-places-manager/plugin.php:281
+msgid "Rue :"
+msgstr "Street:"
+
+#: wp-places-manager/plugin.php:284
+msgid "Ville :"
+msgstr "City:"
+
+#: wp-places-manager/plugin.php:287
+msgid "Pays :"
+msgstr "Country:"
+
+#: wp-places-manager/plugin.php:307
+msgid "Coordonnées géographiques"
+msgstr ""
+
+#: wp-places-manager/plugin.php:326
+msgid "Coordonnées géographiques X :"
+msgstr ""
+
+#: wp-places-manager/plugin.php:329
+msgid "Coordonnées géographiques Y :"
+msgstr ""
+
+#: wp-places-manager/plugin.php:380
+msgid "Ville"
+msgstr "City"
+
+#: wp-places-manager/plugin.php:381
+msgid "Pays"
+msgstr "Country"
+
+#: wp-places-manager/plugin.php:409
+msgid "Afficher toutes les catégories"
+msgstr "Show all categories"
