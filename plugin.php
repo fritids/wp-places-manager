@@ -1,18 +1,18 @@
 <?php
 /*
-Plugin Name: mba-places-manager
-Plugin URI: TODO
-Description: TODO
+Plugin Name: wp-places-manager
+Plugin URI: https://github.com/jlethuau/wp-places-manager
+Description: A wordpress plugin to easily manage places in Wordpress using cutom post types.
 Version: 0.1-sample
 Author: mbamultimedia
 Author URI: http://www.mba-multimedia.com/
 Author Email: TODO
 License:
 
-  Copyright 2013 MBA Multimedia (email@domain.com)
+  Copyright 2013 MBA Multimedia (mbamultimedia@gmail.com)
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License, version 2, as 
+  it under the terms of the GNU General Public License, version 2, as
   published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -23,36 +23,38 @@ License:
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-  
+
 */
 
+require_once('widget.php');
+
 class PlacesManager {
-	 
+
 	/*--------------------------------------------*
 	 * Constructor
 	 *--------------------------------------------*/
-	
+
 	/**
 	 * Initializes the plugin by setting localization, filters, and administration functions.
 	 */
 	function __construct() {
-		
+
 		// Load plugin text domain
 		add_action( 'init', array( $this, 'plugin_textdomain' ) );
 
 		// Register admin styles and scripts
 		add_action( 'admin_print_styles', array( $this, 'register_admin_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_admin_scripts' ) );
-	
+
 		// Register site styles and scripts
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_plugin_styles' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_plugin_scripts' ) );
-	
+
 		// Register hooks that are fired when the plugin is activated, deactivated, and uninstalled, respectively.
 		register_activation_hook( __FILE__, array( $this, 'activate' ) );
 		register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
 		register_uninstall_hook( __FILE__, array( $this, 'uninstall' ) );
-		
+
 	    /*
 	     * TODO:
 	     * Define the custom functionality for your plugin. The first parameter of the
@@ -61,7 +63,7 @@ class PlacesManager {
 	     * The second parameter is the function name located within this class. See the stubs
 	     * later in the file.
 	     *
-	     * For more information: 
+	     * For more information:
 	     * http://codex.wordpress.org/Plugin_API#Hooks.2C_Actions_and_Filters
 	     */
 	    // Adding Post Thumbnail Support to the theme (Featured image)
@@ -76,9 +78,9 @@ class PlacesManager {
 	    // Ajout d'attributs particuliers sur ce nouveau type
 	    // puis traitement des données attributs saisies
 	    add_action( 'add_meta_boxes',  array( $this, 'places_geoloc_add_custom_box' ) ); /* add_action( 'admin_init', array( $this, 'places_geoloc_add_custom_box' ) ); */ // Before WP 3.0
-		add_action( 'save_post', array( $this, 'places_geoloc_save_postdata' ) );  
-	    add_action( 'add_meta_boxes',  array( $this, 'places_address_add_custom_box' ) ); 
-		add_action( 'save_post', array( $this, 'places_address_save_postdata' ) );  
+		add_action( 'save_post', array( $this, 'places_geoloc_save_postdata' ) );
+	    add_action( 'add_meta_boxes',  array( $this, 'places_address_add_custom_box' ) );
+		add_action( 'save_post', array( $this, 'places_address_save_postdata' ) );
 
 		// Exemple filtre
 	    // add_filter( 'TODO', array( $this, 'filter_method_name' ) );
@@ -93,7 +95,7 @@ class PlacesManager {
 		add_action( 'manage_posts_custom_column', array( $this, 'populate_places_columns' ) );
 		// Permettre le tri des colonnes ajoutées
 		add_filter( 'manage_edit-places_sortable_columns', array( $this, 'sort_places_columns' ) );
-		/* 
+		/*
 		Pour un tri différent du tri alphabétique :
 		http://wp.tutsplus.com/tutorials/plugins/a-guide-to-wordpress-custom-post-types-taxonomies-admin-columns-filters-and-archives/
 		*/
@@ -103,87 +105,90 @@ class PlacesManager {
 		// Affichage suite au filtrage
 		add_filter( 'parse_query',array( $this, 'perform_places_category_filtering' ) );
 
+		// Ajout widget
+		add_action( 'widgets_init', create_function( '', 'register_widget( "PlacesWidget" );' ) );
+
 	} // end constructor
-	
+
 	/**
 	 * Fired when the plugin is activated.
 	 *
-	 * @param	boolean	$network_wide	True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog 
+	 * @param	boolean	$network_wide	True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog
 	 */
 	public function activate( $network_wide ) {
 		// TODO:	Define activation functionality here
 	} // end activate
-	
+
 	/**
 	 * Fired when the plugin is deactivated.
 	 *
-	 * @param	boolean	$network_wide	True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog 
+	 * @param	boolean	$network_wide	True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog
 	 */
 	public function deactivate( $network_wide ) {
-		// TODO:	Define deactivation functionality here		
+		// TODO:	Define deactivation functionality here
 	} // end deactivate
-	
+
 	/**
 	 * Fired when the plugin is uninstalled.
 	 *
-	 * @param	boolean	$network_wide	True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog 
+	 * @param	boolean	$network_wide	True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog
 	 */
 	public function uninstall( $network_wide ) {
-		// TODO:	Define uninstall functionality here		
+		// TODO:	Define uninstall functionality here
 	} // end uninstall
 
 	/**
 	 * Loads the plugin text domain for translation
 	 */
 	public function plugin_textdomain() {
-	
+
 		$domain = 'mba-places-manager-locale';
 		$locale = apply_filters( 'plugin_locale', get_locale(), $domain );
 		load_textdomain( $domain, WP_LANG_DIR.'/'.$domain.'/'.$domain.'-'.$locale.'.mo' );
 		load_plugin_textdomain( $domain, FALSE, dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
-	
+
 	} // end plugin_textdomain
 
 	/**
 	 * Registers and enqueues admin-specific styles.
 	 */
 	public function register_admin_styles() {
-	
+
 		wp_enqueue_style( 'mba-places-manager-admin-styles', plugins_url( 'mba-places-manager/css/admin.css' ) );
-	
+
 	} // end register_admin_styles
 
 	/**
 	 * Registers and enqueues admin-specific JavaScript.
-	 */	
+	 */
 	public function register_admin_scripts() {
-	
+
 		wp_enqueue_script( 'mba-places-manager-admin-script', plugins_url( 'mba-places-manager/js/admin.js' ) );
-	
+
 	} // end register_admin_scripts
-	
+
 	/**
 	 * Registers and enqueues plugin-specific styles.
 	 */
 	public function register_plugin_styles() {
-	
+
 		wp_enqueue_style( 'mba-places-manager-plugin-styles', plugins_url( 'mba-places-manager/css/display.css' ) );
-	
+
 	} // end register_plugin_styles
-	
+
 	/**
 	 * Registers and enqueues plugin-specific scripts.
 	 */
 	public function register_plugin_scripts() {
-	
+
 		wp_enqueue_script( 'mba-places-manager-plugin-script', plugins_url( 'mba-places-manager/js/display.js' ) );
-	
+
 	} // end register_plugin_scripts
-	
+
 	/*--------------------------------------------*
 	 * Core Functions
 	 *---------------------------------------------*/
-	
+
 	/**
  	 * NOTE:  Actions are points in the execution of a page or process
 	 *        lifecycle that WordPress fires.
@@ -191,7 +196,7 @@ class PlacesManager {
 	 *		  WordPress Actions: http://codex.wordpress.org/Plugin_API#Actions
 	 *		  Action Reference:  http://codex.wordpress.org/Plugin_API/Action_Reference
 	 */
-	
+
 	/**
 	 * Ajout du custom post type 'places' et des ses attributs pour la gestion des lieux dans Wordpress
 	 */
@@ -199,60 +204,60 @@ class PlacesManager {
 
 		// Ajout custom type "places"
 
-		$labels = array(  
+		$labels = array(
 			'name' => _x('Lieux', 'post type general name', 'mba-places-manager-locale'),
 			'singular_name' => _x('Lieu', 'post type singular name', 'mba-places-manager-locale'),
-			'add_new' => _x('Ajouter', 'Lieu', 'mba-places-manager-locale'),  
+			'add_new' => _x('Ajouter', 'Lieu', 'mba-places-manager-locale'),
 			'add_new_item' => __('Ajouter nouveau lieu', 'mba-places-manager-locale'),
-			'edit_item' => __('Editer lieu'),  
-			'new_item' => __('Nouveau lieu'),  
-			'all_items' => __('Tous les lieux'),  
-			'view_item' => __('Voir lieu', 'mba-places-manager-locale'),  
-			'search_items' => __('Rechercher lieu', 'mba-places-manager-locale'),  
-			'not_found' =>  __('Aucun lieu trouvé', 'mba-places-manager-locale'),  
-			'not_found_in_trash' => __('Aucun lieu dans la corbeille', 'mba-places-manager-locale'),   
-			'parent_item_colon' => '',  
+			'edit_item' => __('Editer lieu'),
+			'new_item' => __('Nouveau lieu'),
+			'all_items' => __('Tous les lieux'),
+			'view_item' => __('Voir lieu', 'mba-places-manager-locale'),
+			'search_items' => __('Rechercher lieu', 'mba-places-manager-locale'),
+			'not_found' =>  __('Aucun lieu trouvé', 'mba-places-manager-locale'),
+			'not_found_in_trash' => __('Aucun lieu dans la corbeille', 'mba-places-manager-locale'),
+			'parent_item_colon' => '',
 			'menu_name' => _x('Lieux', 'wordpress admin menu name', 'mba-places-manager-locale')
-			);  
-		$args = array(  
-			'labels' => $labels,  
-			'public' => true,  
-			'publicly_queryable' => true,  
-			'show_ui' => true,   
-			'show_in_menu' => true,   
-			'query_var' => true,  
-			'rewrite' => true,  
-			'capability_type' => 'post',  
-			'hierarchical' => false,  
+			);
+		$args = array(
+			'labels' => $labels,
+			'public' => true,
+			'publicly_queryable' => true,
+			'show_ui' => true,
+			'show_in_menu' => true,
+			'query_var' => true,
+			'rewrite' => true,
+			'capability_type' => 'post',
+			'hierarchical' => false,
 			'supports' => array( 'title', 'editor', 'thumbnail' ),
             //'menu_icon' => plugins_url( 'images/image.png', __FILE__ ),
-			);   
+			);
 
-		register_post_type('places',$args); 
+		register_post_type('places',$args);
 
 		// Ajout categories pour classer les lieux
 
-		$labels = array(  
-			'name' => _x( 'Catégories de lieu', 'taxonomy general name', 'mba-places-manager-locale' ),  
-			'singular_name' => _x( 'Catégorie de lieu', 'taxonomy singular name', 'mba-places-manager-locale' ),  
-			'search_items' =>  __( 'Rechercher catégorie', 'mba-places-manager-locale' ),  
-			'all_items' => __( 'Toutes les catégories', 'mba-places-manager-locale' ),  
-			'parent_item' => __( 'Parent', 'mba-places-manager-locale' ),  
-			'parent_item_colon' => __( 'Parent:', 'mba-places-manager-locale' ),  
-			'edit_item' => __( 'Editer catégorie', 'mba-places-manager-locale' ),   
-			'update_item' => __( 'Update Product Category', 'mba-places-manager-locale' ),  
-			'add_new_item' => __( 'Ajouter nouvelle catégorie', 'mba-places-manager-locale' ),  
-			'new_item_name' => __( 'Nouvelle catégorie', 'mba-places-manager-locale' ),  
-			'menu_name' => __( 'Catégories de lieux', 'mba-places-manager-locale' )  
-			);      
+		$labels = array(
+			'name' => _x( 'Catégories de lieu', 'taxonomy general name', 'mba-places-manager-locale' ),
+			'singular_name' => _x( 'Catégorie de lieu', 'taxonomy singular name', 'mba-places-manager-locale' ),
+			'search_items' =>  __( 'Rechercher catégorie', 'mba-places-manager-locale' ),
+			'all_items' => __( 'Toutes les catégories', 'mba-places-manager-locale' ),
+			'parent_item' => __( 'Parent', 'mba-places-manager-locale' ),
+			'parent_item_colon' => __( 'Parent:', 'mba-places-manager-locale' ),
+			'edit_item' => __( 'Editer catégorie', 'mba-places-manager-locale' ),
+			'update_item' => __( 'Update Product Category', 'mba-places-manager-locale' ),
+			'add_new_item' => __( 'Ajouter nouvelle catégorie', 'mba-places-manager-locale' ),
+			'new_item_name' => __( 'Nouvelle catégorie', 'mba-places-manager-locale' ),
+			'menu_name' => __( 'Catégories de lieux', 'mba-places-manager-locale' )
+			);
 
-		register_taxonomy('places_categories',array('places'), array(  
-			'hierarchical' => true,  
-			'labels' => $labels,  
-			'query_var' => true,  
-			'show_ui' => true  
-			)); 
-	} 
+		register_taxonomy('places_categories',array('places'), array(
+			'hierarchical' => true,
+			'labels' => $labels,
+			'query_var' => true,
+			'show_ui' => true
+			));
+	}
 
 	/*--------------------------------------------*
 	 * Attributes des lieux
@@ -260,18 +265,18 @@ class PlacesManager {
 
 	// Box coordonnées adresse postale
 
-	function places_address_add_custom_box() {  
-		add_meta_box("address-meta", __( "Coordonnées postales", 'mba-places-manager-locale' ), array( $this , "address_custom_box" ), "places", "normal", "low");  
+	function places_address_add_custom_box() {
+		add_meta_box("address-meta", __( "Coordonnées postales", 'mba-places-manager-locale' ), array( $this , "address_custom_box" ), "places", "normal", "low");
 	}
 
 	// Création custom panel adresse
 
-	function address_custom_box( $place ) {  
+	function address_custom_box( $place ) {
 
 		// Use nonce for verification
   		//wp_nonce_field( plugin_basename( __FILE__ ), 'myplugin_noncename' );
 
-		// global $post;  
+		// global $post;
 		$custom_fields = get_post_custom( $place->ID );
 
 		$street = esc_html( $custom_fields["street"][0] );
@@ -303,19 +308,19 @@ class PlacesManager {
 
 	// Box coordonnées geoloc
 
-	function places_geoloc_add_custom_box() {  
-		add_meta_box("geoloc-meta", __( "Coordonnées géographiques", 'mba-places-manager-locale' ), array( $this , "geoloc_custom_box" ), "places", "normal", "low");  
+	function places_geoloc_add_custom_box() {
+		add_meta_box("geoloc-meta", __( "Coordonnées géographiques", 'mba-places-manager-locale' ), array( $this , "geoloc_custom_box" ), "places", "normal", "low");
 	}
 
 	// Création custom panel geoloc
 
-	function geoloc_custom_box( $place ) {  
+	function geoloc_custom_box( $place ) {
 
 		// Use nonce for verification
   		//wp_nonce_field( plugin_basename( __FILE__ ), 'myplugin_noncename' );
 
-		//global $post;  
-		$custom_fields = get_post_custom($place->ID); 
+		//global $post;
+		$custom_fields = get_post_custom($place->ID);
 
 		$coord_x = floatval( $custom_fields["coord-x"][0] );
 		$coord_y = floatval( $custom_fields["coord-y"][0] );
@@ -351,6 +356,7 @@ class PlacesManager {
 	 */
 
 	function get_places_template( $places_template ) {
+		// Exemple de code possible
 		/*if ( get_post_type() == 'places' ) {
 		    if ( is_single() ) {
 		    	// Template pour la fiche "lieu"
@@ -399,7 +405,7 @@ class PlacesManager {
 		$columns['country'] = 'country';
 
 		return $columns;
-	} 
+	}
 
 	function places_filter_list() {
 		$screen = get_current_screen();
@@ -427,7 +433,7 @@ class PlacesManager {
 			$qv['places_categories'] = $term->slug;
 		}
 	}
-  
+
 } // end class
 
 // Instantiation call of the plugin
