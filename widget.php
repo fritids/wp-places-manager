@@ -85,6 +85,8 @@ class PlacesWidget extends WP_Widget {
 	    $myplaces = array( 'post_type' => 'places', );
 	    $loop = new WP_Query( $myplaces );
 
+	    // TODO Ajouter emplacement image
+
 		echo '<ul>'; 
 
 	    while ( $loop->have_posts() ) : $loop->the_post();
