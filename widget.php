@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * A widget to display places as a list.
  */
@@ -70,10 +70,10 @@ class PlacesWidget extends WP_Widget {
 		}
 		?>
 		<p>
-		<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Titre :' ); ?></label> 
+		<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Titre :' ); ?></label>
 		<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 		</p>
-		<?php 
+		<?php
 	}
 
 	/**
@@ -82,18 +82,16 @@ class PlacesWidget extends WP_Widget {
 	private function generateWidgetContent() {
 		// TODO Ici coder le widget
 
-	    $myplaces = array( 'post_type' => 'places', );
+	    $myplaces = array( 'post_type' => 'place', );
 	    $loop = new WP_Query( $myplaces );
 
-	    // TODO Ajouter emplacement image
-
-		echo '<ul>'; 
+		echo '<ul>';
 
 	    while ( $loop->have_posts() ) : $loop->the_post();
 	        ?>
 	        <li><a href="<?php the_permalink() ?>" title=""><?php the_title() ?></a></li>
 	        <?php
-	    endwhile; 
+	    endwhile;
 
 		echo '</ul>';
 	}
