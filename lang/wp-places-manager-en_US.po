@@ -4,60 +4,60 @@ msgstr ""
 "POT-Creation-Date: 2013-03-21 15:50+0100\n"
 "PO-Revision-Date: 2013-03-21 15:52+0100\n"
 "Last-Translator: MBA Multimedia <mbamultimedia@gmail.com>\n"
-"Language-Team: \n"
-"Language: Français\n"
+"Language-Team: MBA Multimedia\n"
+"Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.5\n"
 "X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_x\n"
-"X-Poedit-Basepath: ..\n"
+"X-Poedit-Basepath: C:\\Developpement\\projets\\wordpress\\plugins\\\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPath-0: wp-places-manager\n"
 
 #: plugin.php:221 plugin.php:233
 msgid "Lieux"
-msgstr ""
+msgstr "Places"
 
 #: plugin.php:222
 msgid "Lieu"
-msgstr ""
+msgstr "Place"
 
 #: plugin.php:223
 msgid "Ajouter"
-msgstr ""
+msgstr "Add"
 
 #: plugin.php:224
 msgid "Ajouter nouveau lieu"
-msgstr ""
+msgstr "Add new place"
 
 #: plugin.php:225
 msgid "Editer lieu"
-msgstr ""
+msgstr "Edit place"
 
 #: plugin.php:226
 msgid "Nouveau lieu"
-msgstr ""
+msgstr "New place"
 
 #: plugin.php:227
 msgid "Tous les lieux"
-msgstr ""
+msgstr "All places"
 
 #: plugin.php:228
 msgid "Voir lieu"
-msgstr ""
+msgstr "See place"
 
 #: plugin.php:229
 msgid "Rechercher lieu"
-msgstr ""
+msgstr "Find a place"
 
 #: plugin.php:230
 msgid "Aucun lieu trouvé"
-msgstr ""
+msgstr "No place found"
 
 #: plugin.php:231
 msgid "Aucun lieu dans la corbeille"
-msgstr ""
+msgstr "No place in the trash"
 
 #: plugin.php:238
 msgid "Décrit un lieu et les caractéristiques de ce lieu"
@@ -65,19 +65,19 @@ msgstr ""
 
 #: plugin.php:261
 msgid "Catégories de lieu"
-msgstr ""
+msgstr "Place categories"
 
 #: plugin.php:262
 msgid "Catégorie de lieu"
-msgstr ""
+msgstr "Place category"
 
 #: plugin.php:263
 msgid "Rechercher catégorie"
-msgstr ""
+msgstr "Find a category"
 
 #: plugin.php:264
 msgid "Toutes les catégories"
-msgstr ""
+msgstr "All categories"
 
 #: plugin.php:265
 msgid "Parent"
@@ -97,11 +97,11 @@ msgstr ""
 
 #: plugin.php:269
 msgid "Ajouter nouvelle catégorie"
-msgstr ""
+msgstr "Add new category"
 
 #: plugin.php:270
 msgid "Nouvelle catégorie"
-msgstr ""
+msgstr "New category"
 
 #: plugin.php:271
 msgid "Catégories de lieux"
@@ -113,15 +113,15 @@ msgstr ""
 
 #: plugin.php:316
 msgid "Rue :"
-msgstr ""
+msgstr "Street:"
 
 #: plugin.php:319
 msgid "Ville :"
-msgstr ""
+msgstr "City:"
 
 #: plugin.php:322
 msgid "Pays :"
-msgstr ""
+msgstr "Country:"
 
 #: plugin.php:344
 msgid "Coordonnées géographiques"
@@ -199,15 +199,15 @@ msgstr ""
 
 #: plugin.php:517
 msgid "Ville"
-msgstr ""
+msgstr "City"
 
 #: plugin.php:518
 msgid "Pays"
-msgstr ""
+msgstr "Country"
 
 #: plugin.php:546
 msgid "Afficher toutes les catégories"
-msgstr ""
+msgstr "Show all categories"
 
 #: widget.php:14
 msgid "Widgets lieux"
@@ -215,4 +215,4 @@ msgstr ""
 
 #: widget.php:69
 msgid "Nouveau titre"
-msgstr ""
+msgstr "New title"
