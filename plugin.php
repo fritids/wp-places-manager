@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: wp-places-manager
+Plugin Name: WP Places Manager
 Plugin URI: https://github.com/jlethuau/wp-places-manager
 Description: A wordpress plugin to easily manage places in Wordpress using cutom post types.
 Version: 0.1-sample
@@ -26,7 +26,8 @@ License:
 
 */
 
-require_once('widget.php');
+require_once('widget-list.php');
+// require_once('widget-find.php'); // TODO: Ajouter d'autres widgets (ex. Recherche, affichage d'un lieu...)
 
 class PlacesManager {
 
@@ -42,6 +43,9 @@ class PlacesManager {
 		// Load plugin text domain
 		add_action( 'init', array( $this, 'plugin_textdomain' ) );
 
+		// Use Wordpress included jQuery library
+		wp_enqueue_script('jquery');
+
 		// Register admin styles and scripts
 		add_action( 'admin_print_styles', array( $this, 'register_admin_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_admin_scripts' ) );
@@ -56,7 +60,6 @@ class PlacesManager {
 		register_uninstall_hook( __FILE__, array( $this, 'uninstall' ) );
 
 	    /*
-	     * TODO:
 	     * Define the custom functionality for your plugin. The first parameter of the
 	     * add_action/add_filter calls are the hooks into which your code should fire.
 	     *
@@ -66,14 +69,15 @@ class PlacesManager {
 	     * For more information:
 	     * http://codex.wordpress.org/Plugin_API#Hooks.2C_Actions_and_Filters
 	     */
+
 	    // Adding Post Thumbnail Support to the theme (Featured image)
 		add_theme_support( 'post-thumbnails' );
 
 		// Exemple action
 	    //add_action( 'TODO', array( $this, 'action_method_name' ) );
 
-		// Ajout custom post type : Places (= lieux)
-	    add_action( 'init', array( $this, 'register_places' ) );
+		// Ajout custom post type : Place (= lieux)
+	    add_action( 'init', array( $this, 'register_place_custom_post_type' ) );
 
 	    // Ajout d'attributs particuliers sur ce nouveau type
 	    // puis traitement des données attributs saisies
@@ -81,6 +85,8 @@ class PlacesManager {
 		add_action( 'save_post', array( $this, 'places_geoloc_save_postdata' ) );
 	    add_action( 'add_meta_boxes',  array( $this, 'places_address_add_custom_box' ) );
 		add_action( 'save_post', array( $this, 'places_address_save_postdata' ) );
+	    add_action( 'add_meta_boxes',  array( $this, 'places_media_add_custom_box' ) );
+		add_action( 'save_post', array( $this, 'places_media_save_postdata' ) );
 
 		// Exemple filtre
 	    // add_filter( 'TODO', array( $this, 'filter_method_name' ) );
@@ -90,11 +96,11 @@ class PlacesManager {
 		add_filter( 'template_include', array( $this, 'get_places_template' ) );
 
 	    // Personalisation des colonnes affichées dans le back
-	    add_filter( 'manage_edit-places_columns', array( $this, 'admin_places_columns' ) );
+	    add_filter( 'manage_edit-place_columns', array( $this, 'admin_places_columns' ) );
 		// Remplissage des nouvelles colonnes
 		add_action( 'manage_posts_custom_column', array( $this, 'populate_places_columns' ) );
 		// Permettre le tri des colonnes ajoutées
-		add_filter( 'manage_edit-places_sortable_columns', array( $this, 'sort_places_columns' ) );
+		add_filter( 'manage_edit-place_sortable_columns', array( $this, 'sort_places_columns' ) );
 		/*
 		Pour un tri différent du tri alphabétique :
 		http://wp.tutsplus.com/tutorials/plugins/a-guide-to-wordpress-custom-post-types-taxonomies-admin-columns-filters-and-archives/
@@ -104,6 +110,12 @@ class PlacesManager {
 		add_action( 'restrict_manage_posts', array( $this, 'places_filter_list' ) );
 		// Affichage suite au filtrage
 		add_filter( 'parse_query',array( $this, 'perform_places_category_filtering' ) );
+
+		// Mettre a jour les messages du back pour être cohérent avec le custom post type
+		add_filter( 'post_updated_messages', array( $this, 'get_places_custom_messages' ) );
+
+		// Affiche une aide contextuelle pour le custom post type
+		add_action( 'contextual_help', array( $this, 'add_places_help_text' ), 10, 3 );
 
 		// Ajout widget
 		add_action( 'widgets_init', create_function( '', 'register_widget( "PlacesWidget" );' ) );
@@ -154,7 +166,7 @@ class PlacesManager {
 	 */
 	public function register_admin_styles() {
 
-		wp_enqueue_style( 'mba-places-manager-admin-styles', plugins_url( 'mba-places-manager/css/admin.css' ) );
+		wp_enqueue_style( 'mba-places-manager-admin-styles', plugins_url( dirname( plugin_basename( __FILE__ ) ) . '/css/admin.css' ) );
 
 	} // end register_admin_styles
 
@@ -163,7 +175,14 @@ class PlacesManager {
 	 */
 	public function register_admin_scripts() {
 
-		wp_enqueue_script( 'mba-places-manager-admin-script', plugins_url( 'mba-places-manager/js/admin.js' ) );
+		//wp_enqueue_script( 'mba-places-manager-admin-script', plugins_url( dirname( plugin_basename( __FILE__ ) ) . '/js/admin.js' ) );
+
+		wp_register_script( 'mba-places-manager-admin-script', plugins_url( dirname( plugin_basename( __FILE__ ) ) . '/js/admin.js' ) );
+		wp_enqueue_script( 'mba-places-manager-admin-script' );
+
+		// Gestion de l'upload des meta de type fichiers
+		//wp_register_script( 'custom_admin_script', get_template_directory_uri() . '/js/admin.js' );
+		//wp_enqueue_script( 'custom_admin_script' );
 
 	} // end register_admin_scripts
 
@@ -172,7 +191,7 @@ class PlacesManager {
 	 */
 	public function register_plugin_styles() {
 
-		wp_enqueue_style( 'mba-places-manager-plugin-styles', plugins_url( 'mba-places-manager/css/display.css' ) );
+		wp_enqueue_style( 'mba-places-manager-plugin-styles', plugins_url( dirname( plugin_basename( __FILE__ ) ) . '/css/display.css' ) );
 
 	} // end register_plugin_styles
 
@@ -181,7 +200,7 @@ class PlacesManager {
 	 */
 	public function register_plugin_scripts() {
 
-		wp_enqueue_script( 'mba-places-manager-plugin-script', plugins_url( 'mba-places-manager/js/display.js' ) );
+		wp_enqueue_script( 'mba-places-manager-plugin-script', plugins_url( dirname( plugin_basename( __FILE__ ) ) . '/js/display.js' ) );
 
 	} // end register_plugin_scripts
 
@@ -200,73 +219,94 @@ class PlacesManager {
 	/**
 	 * Ajout du custom post type 'places' et des ses attributs pour la gestion des lieux dans Wordpress
 	 */
-	function register_places() {
+	function register_place_custom_post_type() {
 
-		// Ajout custom type "places"
+		// Ajout custom type "place"
 
 		$labels = array(
-			'name' => _x('Lieux', 'post type general name', 'mba-places-manager-locale'),
-			'singular_name' => _x('Lieu', 'post type singular name', 'mba-places-manager-locale'),
-			'add_new' => _x('Ajouter', 'Lieu', 'mba-places-manager-locale'),
-			'add_new_item' => __('Ajouter nouveau lieu', 'mba-places-manager-locale'),
-			'edit_item' => __('Editer lieu'),
-			'new_item' => __('Nouveau lieu'),
-			'all_items' => __('Tous les lieux'),
-			'view_item' => __('Voir lieu', 'mba-places-manager-locale'),
-			'search_items' => __('Rechercher lieu', 'mba-places-manager-locale'),
-			'not_found' =>  __('Aucun lieu trouvé', 'mba-places-manager-locale'),
-			'not_found_in_trash' => __('Aucun lieu dans la corbeille', 'mba-places-manager-locale'),
-			'parent_item_colon' => '',
-			'menu_name' => _x('Lieux', 'wordpress admin menu name', 'mba-places-manager-locale')
+				'name' => _x('Lieux', 'post type general name', 'mba-places-manager-locale'),
+				'singular_name' => _x('Lieu', 'post type singular name', 'mba-places-manager-locale'),
+				'add_new' => _x('Ajouter', 'Lieu', 'mba-places-manager-locale'),
+				'add_new_item' => __('Ajouter nouveau lieu', 'mba-places-manager-locale'),
+				'edit_item' => __('Editer lieu'),
+				'new_item' => __('Nouveau lieu'),
+				'all_items' => __('Tous les lieux'),
+				'view_item' => __('Voir lieu', 'mba-places-manager-locale'),
+				'search_items' => __('Rechercher lieu', 'mba-places-manager-locale'),
+				'not_found' =>  __('Aucun lieu trouvé', 'mba-places-manager-locale'),
+				'not_found_in_trash' => __('Aucun lieu dans la corbeille', 'mba-places-manager-locale'),
+				'parent_item_colon' => '',
+				'menu_name' => _x('Lieux', 'wordpress admin menu name', 'mba-places-manager-locale')
 			);
+
 		$args = array(
-			'labels' => $labels,
-			'public' => true,
-			'publicly_queryable' => true,
-			'show_ui' => true,
-			'show_in_menu' => true,
-			'query_var' => true,
-			'rewrite' => true,
-			'capability_type' => 'post',
-			'hierarchical' => false,
-			'supports' => array( 'title', 'editor', 'thumbnail' ),
-            //'menu_icon' => plugins_url( 'images/image.png', __FILE__ ),
+				'labels' => $labels,
+				'description' => __('Décrit un lieu et les caractéristiques de ce lieu', 'mba-places-manager-locale'),
+				'public' => true,
+				'publicly_queryable' => true,
+				'show_ui' => true,
+				'show_in_menu' => true,
+				'query_var' => true,
+				'rewrite' => true,
+				'capability_type' => 'post',
+				'hierarchical' => false,
+				'supports' => array( 'title', 'editor', 'thumbnail' ),
+	            // 'menu_icon' => plugins_url( 'images/image.png', __FILE__ ),
+				// 'menu_position' => 5,
+	            'taxonomies' => array( 'post_tag' ), // array( 'category', 'post_tag' ), // Attention : Ces taxonomies seront partagés avec les articles !
+				'has_archive' => true,
 			);
 
-		register_post_type('places',$args);
+		register_post_type('place',$args);
 
-		// Ajout categories pour classer les lieux
+		// Ajout custom taxonomy (Exemple : categories pour classer les lieux)
+		// Note : les catégories pourraients être gérées en natif via : 'taxonomies' => array( 'category', 'post_tag' )
+		// A réserver donc à un nouveau type de taxonomie (3 dans WP en natif : categories, tags et link categories)
+		// ou si l'on souhaite avoir des catégories et tags différents entre les post_types
 
 		$labels = array(
-			'name' => _x( 'Catégories de lieu', 'taxonomy general name', 'mba-places-manager-locale' ),
-			'singular_name' => _x( 'Catégorie de lieu', 'taxonomy singular name', 'mba-places-manager-locale' ),
-			'search_items' =>  __( 'Rechercher catégorie', 'mba-places-manager-locale' ),
-			'all_items' => __( 'Toutes les catégories', 'mba-places-manager-locale' ),
-			'parent_item' => __( 'Parent', 'mba-places-manager-locale' ),
-			'parent_item_colon' => __( 'Parent:', 'mba-places-manager-locale' ),
-			'edit_item' => __( 'Editer catégorie', 'mba-places-manager-locale' ),
-			'update_item' => __( 'Update Product Category', 'mba-places-manager-locale' ),
-			'add_new_item' => __( 'Ajouter nouvelle catégorie', 'mba-places-manager-locale' ),
-			'new_item_name' => __( 'Nouvelle catégorie', 'mba-places-manager-locale' ),
-			'menu_name' => __( 'Catégories de lieux', 'mba-places-manager-locale' )
+				'name' => _x( 'Catégories de lieu', 'taxonomy general name', 'mba-places-manager-locale' ),
+				'singular_name' => _x( 'Catégorie de lieu', 'taxonomy singular name', 'mba-places-manager-locale' ),
+				'search_items' =>  __( 'Rechercher catégorie', 'mba-places-manager-locale' ),
+				'all_items' => __( 'Toutes les catégories', 'mba-places-manager-locale' ),
+				'parent_item' => __( 'Parent', 'mba-places-manager-locale' ),
+				'parent_item_colon' => __( 'Parent :', 'mba-places-manager-locale' ),
+				'edit_item' => __( 'Editer catégorie', 'mba-places-manager-locale' ),
+				'update_item' => __( 'Mettre à jour la catégorie', 'mba-places-manager-locale' ),
+				'add_new_item' => __( 'Ajouter nouvelle catégorie', 'mba-places-manager-locale' ),
+				'new_item_name' => __( 'Nouvelle catégorie', 'mba-places-manager-locale' ),
+				'menu_name' => __( 'Catégories de lieux', 'mba-places-manager-locale' )
 			);
 
-		register_taxonomy('places_categories',array('places'), array(
-			'hierarchical' => true,
-			'labels' => $labels,
-			'query_var' => true,
-			'show_ui' => true
-			));
+		register_taxonomy(
+				'places_categories',
+				array('place'),
+				array(
+					'hierarchical' => true,
+					'labels' => $labels,
+					'query_var' => true,
+					'show_ui' => true
+				)
+			);
 	}
 
 	/*--------------------------------------------*
 	 * Attributes des lieux
 	 *---------------------------------------------*/
 
-	// Box coordonnées adresse postale
+	// Cf. http://wp.smashingmagazine.com/2012/11/08/complete-guide-custom-post-types/
+
+	// Box coordonnées adresse postale -----------------------------
 
 	function places_address_add_custom_box() {
-		add_meta_box("address-meta", __( "Coordonnées postales", 'mba-places-manager-locale' ), array( $this , "address_custom_box" ), "places", "normal", "low");
+		add_meta_box(
+				"address-meta",
+				__( "Coordonnées postales", 'mba-places-manager-locale' ),
+				array( $this , "address_custom_box" ),
+				"place",
+				"normal",
+				"low"
+			);
 	}
 
 	// Création custom panel adresse
@@ -274,9 +314,8 @@ class PlacesManager {
 	function address_custom_box( $place ) {
 
 		// Use nonce for verification
-  		//wp_nonce_field( plugin_basename( __FILE__ ), 'myplugin_noncename' );
+  		wp_nonce_field( plugin_basename( __FILE__ ), 'places_manager_noncename' );
 
-		// global $post;
 		$custom_fields = get_post_custom( $place->ID );
 
 		$street = esc_html( $custom_fields["street"][0] );
@@ -295,21 +334,34 @@ class PlacesManager {
 
 	// Sauvegarde des données adresse
 
-	function places_address_save_postdata() {
-		/*if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE )
-			return $post_id;*/
-		global $post;
-		update_post_meta($post->ID, "street", $_POST["street"]);
-		update_post_meta($post->ID, "city", $_POST["city"]);
-		update_post_meta($post->ID, "country", $_POST["country"]);
+	function places_address_save_postdata( $post_id ) {
+
+		if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+
+		// TODO: Ajouter vérification nonce_field
+
+		// TODO: Vérifier droit user a modifier cet objet
+
+		update_post_meta( $post_id, "street", $_POST["street"] );
+		update_post_meta( $post_id, "city", $_POST["city"] );
+		update_post_meta( $post_id, "country", $_POST["country"] );
 	}
 
-	// Fin coordonnées adresse postale
+	// Fin coordonnées adresse postale ----------------------------
 
-	// Box coordonnées geoloc
+	// Box coordonnées geoloc -------------------------------------
 
 	function places_geoloc_add_custom_box() {
-		add_meta_box("geoloc-meta", __( "Coordonnées géographiques", 'mba-places-manager-locale' ), array( $this , "geoloc_custom_box" ), "places", "normal", "low");
+		add_meta_box(
+				"geoloc-meta",
+				__( "Coordonnées géographiques", 'mba-places-manager-locale' ),
+				array( $this , "geoloc_custom_box" ),
+				"place",
+				"side", // Sidebar
+				"low"
+			);
 	}
 
 	// Création custom panel geoloc
@@ -317,35 +369,118 @@ class PlacesManager {
 	function geoloc_custom_box( $place ) {
 
 		// Use nonce for verification
-  		//wp_nonce_field( plugin_basename( __FILE__ ), 'myplugin_noncename' );
+  		wp_nonce_field( plugin_basename( __FILE__ ), 'places_manager_noncename' );
 
-		//global $post;
 		$custom_fields = get_post_custom($place->ID);
 
-		$coord_x = floatval( $custom_fields["coord-x"][0] );
-		$coord_y = floatval( $custom_fields["coord-y"][0] );
+		$coord_lat = floatval( $custom_fields["coord-lat"][0] );
+		$coord_lng = floatval( $custom_fields["coord-lng"][0] );
 
 		// TODO Carte et scripts à coder
 		echo '<div id="map-input"><!-- Maps Google maps pour aide à la localisation --></div>';
 
-		echo '<label for="coord-x">' . __('Coordonnées géographiques X :', 'mba-places-manager-locale') . '</label>';
-		echo '<input id="coord-x" name="coord-x" type="text" value="' . $coord_x .'" />';
+		echo '<label for="coord-lat">' . __('Latitude :', 'mba-places-manager-locale') . '</label>';
+		echo '<input id="coord-lat" name="coord-lat" type="text" value="' . $coord_lat .'" />' . '<br />';
 
-		echo '<label for="coord-y">' . __('Coordonnées géographiques Y :', 'mba-places-manager-locale') . '</label>';
-		echo '<input id="coord-y" name="coord-y" type="text" value="' . $coord_y . '" />';
+		echo '<label for="coord-lng">' . __('Longitude :', 'mba-places-manager-locale') . '</label>';
+		echo '<input id="coord-lng" name="coord-lng" type="text" value="' . $coord_lng . '" />';
 	}
 
 	// Sauvegarde des données geoloc
 
-	function places_geoloc_save_postdata() {
-		/*if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE )
-			return $post_id;*/
-		global $post;
-		update_post_meta($post->ID, "coord-x", $_POST["coord-x"]);
-		update_post_meta($post->ID, "coord-y", $_POST["coord-y"]);
+	function places_geoloc_save_postdata( $post_id ) {
+
+		if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+
+		// TODO: Ajouter vérification nonce_field
+
+		// TODO: Vérifier droit user a modifier cet objet
+
+		// FIXME: Ajouter un test de valeur (float)
+		update_post_meta( $post_id, "coord-lat", $_POST["coord-lat"] );
+		update_post_meta( $post_id, "coord-lng", $_POST["coord-lng"] );
 	}
 
-	// Fin coordonnées geoloc
+	// Fin coordonnées geoloc -------------------------------------
+
+	// Box fichiers liés ------------------------------------------
+
+	function places_media_add_custom_box() {
+		add_meta_box(
+				"media-meta",
+				__( "Fichiers liés", 'mba-places-manager-locale' ),
+				array( $this , "media_custom_box" ),
+				"place",
+				"normal",
+				"low"
+			);
+	}
+
+	// Création custom panel media
+
+	function media_custom_box( $place ) {
+		// Use nonce for verification
+		wp_nonce_field( plugin_basename( __FILE__ ), 'places_manager_noncename' );
+		$custom_fields = get_post_custom( $place->ID );
+
+		$actual_file  = $custom_fields["media-meta"][0];
+
+		echo '<input id="media-meta" type="file" name="media-meta" value="" size="25" />';
+
+		// TODO: Afficher le fichier correctement
+		if ( !empty( $actual_file ) ) {
+			echo '<br/>' . '<label>Fichier lié :</label>' . $actual_file;
+		}
+
+		// TODO: Permettre la suppression du fichier
+	}
+
+	// Sauvegarde des données media
+
+	function places_media_save_postdata( $post_id ) {
+
+		// Verifications sécurité
+		if( !wp_verify_nonce( $_POST['places_manager_noncename'], plugin_basename( __FILE__ ) ) ) {
+			return;
+		}
+
+		if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+
+		if( 'place' == $_POST['post_type']) {
+			if( !current_user_can( 'edit_post', $post_id ) ) {
+				return;
+			}
+		}
+
+		if( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+			return;
+		}
+		// Fin verifications sécurité
+
+		$this->update_custom_meta_data( $post_id, 'media-meta', true );
+	}
+
+	// Gestion particulière pour les meta de type fichiers
+
+	function update_custom_meta_data( $post_id, $data_key, $is_file = false ) {
+
+		if( $is_file && !empty( $_FILES ) ) {
+
+			$upload = wp_handle_upload( $_FILES[$data_key], array( 'test_form' => false ) );
+
+			if( isset( $upload['error'] ) && '0' != $upload['error'] ) {
+				wp_die( __("Une erreur est survenue lors de l'upload de votre fichier.",'mba-places-manager-locale') . var_dump($_FILES) );
+			} else {
+				update_post_meta( $post_id, $data_key, $upload );
+			}
+		}
+	}
+
+	// Fin fichiers liés ------------------------------------------
 
 	/**
 	 * NOTE:  Filters are points of execution in which WordPress modifies data
@@ -355,9 +490,31 @@ class PlacesManager {
 	 *		  Filter Reference:  http://codex.wordpress.org/Plugin_API/Filter_Reference
 	 */
 
+	/**
+	 * Surcharge des messages par défaut dans le back
+	 */
+	function get_places_custom_messages ( $messages ) {
+		global $post, $post_ID;
+		$messages['place'] = array(
+				0 => '',
+				1 => sprintf( __('Lieu mis à jour. <a href="%s">Voir le lieu</a>'), esc_url( get_permalink($post_ID) ) ),
+				2 => __('Champ mis à jour.'),
+				3 => __('Champ supprimé.'),
+				4 => __('Lieu mis à jour.'),
+				5 => isset($_GET['revision']) ? sprintf( __('Lieu restauré à partir de sa revision %s'), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+				6 => sprintf( __('Lieu publié. <a href="%s">Voir lieu</a>'), esc_url( get_permalink($post_ID) ) ),
+				7 => __('Lieu sauvegardé.'),
+				8 => sprintf( __('Lieu soumis. <a target="_blank" href="%s">Prévisualiser lieu</a>'), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
+				9 => sprintf( __('Lieu programmé pour : <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview product</a>'), date_i18n( __( 'M j, Y @ G:i' ), strtotime( $post->post_date ) ), esc_url( get_permalink($post_ID) ) ),
+				10 => sprintf( __('Brouillon du lieu mis à jour. <a target="_blank" href="%s">Prévisualiser lieu</a>'), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
+		);
+
+		return $messages;
+	}
+
 	function get_places_template( $places_template ) {
 		// Exemple de code possible
-		/*if ( get_post_type() == 'places' ) {
+		/*if ( get_post_type() == 'place' ) {
 		    if ( is_single() ) {
 		    	// Template pour la fiche "lieu"
 
@@ -375,8 +532,15 @@ class PlacesManager {
 		    }
 		}*/
 		global $post;
-		if ($post->post_type == 'places') {
-			$places_template = dirname( __FILE__ ) . '/single-places.php';
+		if ($post->post_type == 'place') {
+		    if ( is_single() ) {
+		    	// Template pour la fiche "lieu"
+				$places_template = dirname( __FILE__ ) . '/single-place.php';
+			}
+			else {
+		    	// Template pour le listing "lieu"
+				$places_template = dirname( __FILE__ ) . '/places.php';
+			}
 		}
 
     	return $places_template;
@@ -410,7 +574,7 @@ class PlacesManager {
 	function places_filter_list() {
 		$screen = get_current_screen();
 		global $wp_query;
-		if ( $screen->post_type == 'places' ) {
+		if ( $screen->post_type == 'place' ) {
 			wp_dropdown_categories( array(
 				'show_option_all' => __('Afficher toutes les catégories', 'mba-places-manager-locale' ),
 				'taxonomy' => 'places_categories',
@@ -434,7 +598,37 @@ class PlacesManager {
 		}
 	}
 
+	/**
+	 * Définit le contenu HTML des zones d'aide contextuelle (En ahut des écrans d'admin)
+	 */
+	function add_places_help_text ( $contextual_help, $screen_id, $screen ) {
+		//$contextual_help .= var_dump( $screen ); // use this to help determine $screen->id
+		if ( 'place' == $screen->id ) {
+			$contextual_help =
+			'<p>' . __("Ce qu'il faut savoir concernant l'édition et la manipulation des lieux :", 'mba-places-manager-locale') . '</p>' .
+			'<ul>' .
+			'<li>' . __('Entrez le nom du lieu.', 'mba-places-manager-locale') . '</li>' .
+			'<li>' . __('Saisissez les informations géographiques (Géolocalisation, adresse).', 'mba-places-manager-locale') . '</li>' .
+			'<li>' . __('A compléter...', 'mba-places-manager-locale') . '</li>' .
+			'</ul>' .
+			'<p>' . __('Si vous souhaitez plannifier la publication du lieu à une date future :', 'mba-places-manager-locale') . '</p>' .
+			'<ul>' .
+			'<li>' . __('Dans le bloc de publication, cliquez sur le lien Modifier sur la ligne dédiée à la date de publication.', 'mba-places-manager-locale') . '</li>' .
+			'<li>' . __('Modifiez la date en renseignant la date à laquelle vous souhaitez que le lieu soit publié automatiquement, puis cliquez sur Ok.', 'mba-places-manager-locale') . '</li>' .
+			'</ul>' .
+			'<p><strong>' . __("Pour plus d'information :", 'mba-places-manager-locale') . '</strong></p>' .
+			'<p>' . __('<a href="http://codex.wordpress.org/Posts_Edit_SubPanel" target="_blank">Documentation Wordpress (en)</a>', 'mba-places-manager-locale') . '</p>' .
+			'' ;
+		}
+		elseif ( 'edit-place' == $screen->id )
+		{
+			$contextual_help =
+			'<p>' . __('This is the help screen displaying the table of books blah blah blah.', 'mba-places-manager-locale') . '</p>' ;
+		}
+		return $contextual_help;
+	}
+
 } // end class
 
 // Instantiation call of the plugin
-$plugin_name = new PlacesManager();
+$wp_places_manager = new PlacesManager();
