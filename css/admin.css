@@ -1,1 +1,7 @@
 /* This stylesheet is used to style the admin option form of the plugin. */
+#geoloc-meta label,
+#address-meta label,
+#media-meta label {
+	width: 100px;
+	display: inline-block;
+}
