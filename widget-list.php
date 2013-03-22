@@ -2,16 +2,22 @@
 /**
  * A widget to display places as a list.
  */
+ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+ 
 class PlacesWidget extends WP_Widget {
 
 	/**
 	 * Register widget with WordPress.
 	 */
 	public function __construct() {
+		// Creation Widget par appel constructeur classe mère
 		parent::__construct(
-	 		'places_widget', // Base ID
-			'PlacesWidget', // Name
-			array( 'description' => __( 'Widgets lieux', 'mba-places-manager-locale' ), ) // Args
+	 		'places_widget', 	// Base ID
+			'PlacesWidget', 	// Name
+			array( 
+					'classname'		=> 'widget_places_list',
+					'description' 	=> __( 'Widgets lieux', 'mba-places-manager-locale' ), 
+				) 				// Args
 		);
 	}
 

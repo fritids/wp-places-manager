@@ -17,8 +17,10 @@ get_header();
 <div id="primary">
     <div id="content" role="main">
     <?php
-    $mypost = array( 'post_type' => 'place', );
-    $loop = new WP_Query( $mypost );
+    $args = array(
+    			'post_type' => 'place',
+    		);
+    $loop = new WP_Query( apply_filters( 'places_listing_pre_get_posts', $args ) );
     ?>
     <?php while ( $loop->have_posts() ) : $loop->the_post();?>
         <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>

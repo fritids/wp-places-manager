@@ -6,7 +6,7 @@ Description: A wordpress plugin to easily manage places in Wordpress using cutom
 Version: 0.1-sample
 Author: mbamultimedia
 Author URI: http://www.mba-multimedia.com/
-Author Email: TODO
+Author Email: contact@mba-multimedia.com
 License:
 
   Copyright 2013 MBA Multimedia (mbamultimedia@gmail.com)
@@ -92,8 +92,8 @@ class PlacesManager {
 	    // add_filter( 'TODO', array( $this, 'filter_method_name' ) );
 
 	    // Utilisation d'un template custom pour les lieux à la place du template par défaut de WP
-	    /*add_filter( 'places_template', array( $this, 'get_places_template' ) );*/
-		add_filter( 'template_include', array( $this, 'get_places_template' ) );
+		// add_filter( 'template_include', array( $this, 'get_places_template' ) );
+		// TODO: A activer au besoin si comportement basique du thème inacceptable
 
 	    // Personalisation des colonnes affichées dans le back
 	    add_filter( 'manage_edit-place_columns', array( $this, 'admin_places_columns' ) );
@@ -291,7 +291,7 @@ class PlacesManager {
 	}
 
 	/*--------------------------------------------*
-	 * Attributes des lieux
+	 * Attributs des lieux
 	 *---------------------------------------------*/
 
 	// Cf. http://wp.smashingmagazine.com/2012/11/08/complete-guide-custom-post-types/
@@ -311,12 +311,12 @@ class PlacesManager {
 
 	// Création custom panel adresse
 
-	function address_custom_box( $place ) {
+	function address_custom_box( $post ) {
 
 		// Use nonce for verification
   		wp_nonce_field( plugin_basename( __FILE__ ), 'places_manager_noncename' );
 
-		$custom_fields = get_post_custom( $place->ID );
+		$custom_fields = get_post_custom( $post->ID );
 
 		$street = esc_html( $custom_fields["street"][0] );
 		$city = esc_html( $custom_fields["city"][0] );
@@ -366,12 +366,12 @@ class PlacesManager {
 
 	// Création custom panel geoloc
 
-	function geoloc_custom_box( $place ) {
+	function geoloc_custom_box( $post ) {
 
 		// Use nonce for verification
   		wp_nonce_field( plugin_basename( __FILE__ ), 'places_manager_noncename' );
 
-		$custom_fields = get_post_custom($place->ID);
+		$custom_fields = get_post_custom($post->ID);
 
 		$coord_lat = floatval( $custom_fields["coord-lat"][0] );
 		$coord_lng = floatval( $custom_fields["coord-lng"][0] );
@@ -405,7 +405,7 @@ class PlacesManager {
 
 	// Fin coordonnées geoloc -------------------------------------
 
-	// Box fichiers liés ------------------------------------------
+	// Box fichiers liés (fichiers, images, videos...) ------------
 
 	function places_media_add_custom_box() {
 		add_meta_box(
@@ -420,21 +420,24 @@ class PlacesManager {
 
 	// Création custom panel media
 
-	function media_custom_box( $place ) {
+	function media_custom_box( $post ) {
 		// Use nonce for verification
 		wp_nonce_field( plugin_basename( __FILE__ ), 'places_manager_noncename' );
-		$custom_fields = get_post_custom( $place->ID );
+		$custom_fields = get_post_custom( $post->ID );
 
 		$actual_file  = $custom_fields["media-meta"][0];
 
 		echo '<input id="media-meta" type="file" name="media-meta" value="" size="25" />';
 
-		// TODO: Afficher le fichier correctement
+		// FIXME: Voir comment utiliser json_decode() pour des raisons de sécurité à la place du unserialize()
 		if ( !empty( $actual_file ) ) {
-			echo '<br/>' . '<label>Fichier lié :</label>' . $actual_file;
+			$array_file_meta = unserialize( $actual_file );
+			echo '<br/>' . '<label>Type fichier lié :</label>' . $array_file_meta[ 'type' ];
+			echo '<br/>' . '<label>URL fichier lié :</label>'  . $array_file_meta[ 'url' ];
 		}
 
-		// TODO: Permettre la suppression du fichier
+		// TODO: Permettre également la suppression du fichier (cf. http://codex.wordpress.org/Function_Reference/delete_post_meta)
+		// TODO: Améliorer en permettant l'upload multiple ?
 	}
 
 	// Sauvegarde des données media
@@ -467,7 +470,7 @@ class PlacesManager {
 	// Gestion particulière pour les meta de type fichiers
 
 	function update_custom_meta_data( $post_id, $data_key, $is_file = false ) {
-
+		// FIXME: Le test fichier vide ne parait pas fonctionner correctement (Ici ou dans admin.js ?)
 		if( $is_file && !empty( $_FILES ) ) {
 
 			$upload = wp_handle_upload( $_FILES[$data_key], array( 'test_form' => false ) );
