@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WP Places Manager\n"
-"POT-Creation-Date: 2013-03-21 15:50+0100\n"
-"PO-Revision-Date: 2013-03-21 15:52+0100\n"
+"POT-Creation-Date: 2013-03-25 10:30+0100\n"
+"PO-Revision-Date: 2013-03-25 10:30+0100\n"
 "Last-Translator: MBA Multimedia <mbamultimedia@gmail.com>\n"
 "Language-Team: \n"
 "Language: Français\n"
@@ -15,204 +15,251 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: plugin.php:221 plugin.php:233
+#: plugin.php:227 plugin.php:239
 msgid "Lieux"
 msgstr ""
 
-#: plugin.php:222
+#: plugin.php:228
 msgid "Lieu"
 msgstr ""
 
-#: plugin.php:223
+#: plugin.php:229
 msgid "Ajouter"
 msgstr ""
 
-#: plugin.php:224
+#: plugin.php:230
 msgid "Ajouter nouveau lieu"
 msgstr ""
 
-#: plugin.php:225
+#: plugin.php:231
 msgid "Editer lieu"
 msgstr ""
 
-#: plugin.php:226
+#: plugin.php:232
 msgid "Nouveau lieu"
 msgstr ""
 
-#: plugin.php:227
+#: plugin.php:233
 msgid "Tous les lieux"
 msgstr ""
 
-#: plugin.php:228
+#: plugin.php:234
 msgid "Voir lieu"
 msgstr ""
 
-#: plugin.php:229
+#: plugin.php:235
 msgid "Rechercher lieu"
 msgstr ""
 
-#: plugin.php:230
+#: plugin.php:236
 msgid "Aucun lieu trouvé"
 msgstr ""
 
-#: plugin.php:231
+#: plugin.php:237
 msgid "Aucun lieu dans la corbeille"
 msgstr ""
 
-#: plugin.php:238
+#: plugin.php:244
 msgid "Décrit un lieu et les caractéristiques de ce lieu"
 msgstr ""
 
-#: plugin.php:261
+#: plugin.php:268
 msgid "Catégories de lieu"
 msgstr ""
 
-#: plugin.php:262
+#: plugin.php:269
 msgid "Catégorie de lieu"
 msgstr ""
 
-#: plugin.php:263
+#: plugin.php:270
 msgid "Rechercher catégorie"
 msgstr ""
 
-#: plugin.php:264
+#: plugin.php:271
 msgid "Toutes les catégories"
 msgstr ""
 
-#: plugin.php:265
+#: plugin.php:272
 msgid "Parent"
 msgstr ""
 
-#: plugin.php:266
+#: plugin.php:273
 msgid "Parent :"
 msgstr ""
 
-#: plugin.php:267
+#: plugin.php:274
 msgid "Editer catégorie"
 msgstr ""
 
-#: plugin.php:268
+#: plugin.php:275
 msgid "Mettre à jour la catégorie"
 msgstr ""
 
-#: plugin.php:269
+#: plugin.php:276
 msgid "Ajouter nouvelle catégorie"
 msgstr ""
 
-#: plugin.php:270
+#: plugin.php:277
 msgid "Nouvelle catégorie"
 msgstr ""
 
-#: plugin.php:271
+#: plugin.php:278
 msgid "Catégories de lieux"
 msgstr ""
 
-#: plugin.php:295
+#: plugin.php:304
 msgid "Coordonnées postales"
 msgstr ""
 
-#: plugin.php:316
+#: plugin.php:325
 msgid "Rue :"
 msgstr ""
 
-#: plugin.php:319
+#: plugin.php:328
 msgid "Ville :"
 msgstr ""
 
-#: plugin.php:322
+#: plugin.php:331
 msgid "Pays :"
 msgstr ""
 
-#: plugin.php:344
+#: plugin.php:359
 msgid "Coordonnées géographiques"
 msgstr ""
 
-#: plugin.php:367
+#: plugin.php:382
 msgid "Latitude :"
 msgstr ""
 
-#: plugin.php:370
+#: plugin.php:385
 msgid "Longitude :"
 msgstr ""
 
-#: plugin.php:391
-msgid "Image 1"
+#: plugin.php:413
+msgid "Fichiers liés"
 msgstr ""
 
-#: plugin.php:444
+#: plugin.php:479
 msgid "Une erreur est survenue lors de l'upload de votre fichier."
 msgstr ""
 
-#: plugin.php:468
+#: plugin.php:503
 #, php-format
 msgid "Lieu mis à jour. <a href=\"%s\">Voir le lieu</a>"
 msgstr ""
 
-#: plugin.php:469
+#: plugin.php:504
 msgid "Champ mis à jour."
 msgstr ""
 
-#: plugin.php:470
+#: plugin.php:505
 msgid "Champ supprimé."
 msgstr ""
 
-#: plugin.php:471
+#: plugin.php:506
 msgid "Lieu mis à jour."
 msgstr ""
 
-#: plugin.php:472
+#: plugin.php:507
 #, php-format
 msgid "Lieu restauré à partir de sa revision %s"
 msgstr ""
 
-#: plugin.php:473
+#: plugin.php:508
 #, php-format
 msgid "Lieu publié. <a href=\"%s\">Voir lieu</a>"
 msgstr ""
 
-#: plugin.php:474
+#: plugin.php:509
 msgid "Lieu sauvegardé."
 msgstr ""
 
-#: plugin.php:475
+#: plugin.php:510
 #, php-format
 msgid "Lieu soumis. <a target=\"_blank\" href=\"%s\">Prévisualiser lieu</a>"
 msgstr ""
 
-#: plugin.php:476
+#: plugin.php:511
 #, php-format
 msgid ""
 "Lieu programmé pour : <strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s"
 "\">Preview product</a>"
 msgstr ""
 
-#: plugin.php:476
+#: plugin.php:511
 msgid "M j, Y @ G:i"
 msgstr ""
 
-#: plugin.php:477
+#: plugin.php:512
 #, php-format
 msgid ""
 "Brouillon du lieu mis à jour. <a target=\"_blank\" href=\"%s\">Prévisualiser "
 "lieu</a>"
 msgstr ""
 
-#: plugin.php:517
+#: plugin.php:553
 msgid "Ville"
 msgstr ""
 
-#: plugin.php:518
+#: plugin.php:554
 msgid "Pays"
 msgstr ""
 
-#: plugin.php:546
+#: plugin.php:582
 msgid "Afficher toutes les catégories"
 msgstr ""
 
-#: widget.php:14
+#: plugin.php:611
+msgid ""
+"Ce qu'il faut savoir concernant l'édition et la manipulation des lieux :"
+msgstr ""
+
+#: plugin.php:613
+msgid "Entrez le nom du lieu."
+msgstr ""
+
+#: plugin.php:614
+msgid "Saisissez les informations géographiques (Géolocalisation, adresse)."
+msgstr ""
+
+#: plugin.php:615
+msgid "A compléter..."
+msgstr ""
+
+#: plugin.php:617
+msgid "Si vous souhaitez plannifier la publication du lieu à une date future :"
+msgstr ""
+
+#: plugin.php:619
+msgid ""
+"Dans le bloc de publication, cliquez sur le lien Modifier sur la ligne "
+"dédiée à la date de publication."
+msgstr ""
+
+#: plugin.php:620
+msgid ""
+"Modifiez la date en renseignant la date à laquelle vous souhaitez que le "
+"lieu soit publié automatiquement, puis cliquez sur Ok."
+msgstr ""
+
+#: plugin.php:622
+msgid "Pour plus d'information :"
+msgstr ""
+
+#: plugin.php:623
+msgid ""
+"<a href=\"http://codex.wordpress.org/Posts_Edit_SubPanel\" target=\"_blank"
+"\">Documentation Wordpress (en)</a>"
+msgstr ""
+
+#: plugin.php:629
+msgid "This is the help screen displaying the table of books blah blah blah."
+msgstr ""
+
+#: widget-list.php:19
 msgid "Widgets lieux"
 msgstr ""
 
-#: widget.php:69
+#: widget-list.php:75
 msgid "Nouveau titre"
 msgstr ""
